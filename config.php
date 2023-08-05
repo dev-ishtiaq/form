@@ -2,8 +2,8 @@
 session_start();
 $server     = "localhost";
 $database   = "formdb";
-$username   = "ishtiaq";
-$password   = "aaa";
+$username   = "root";
+$password   = "";
 
 
 $con = mysqli_connect($server, $username, $password, $database);
