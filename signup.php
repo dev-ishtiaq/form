@@ -14,6 +14,7 @@
             <?php
             if(isset($_POST['signup'])) {
                 extract($_POST);
+                $error = array();
                 // ====== fname error ========
                 if(strlen($fname) < 3){
                     $error[] = 'please enter name using 3 charecters atlesst';
@@ -48,17 +49,7 @@
                 if(!filter_var($email, FILTER_VALIDATE_EMAIL)){
                     $error[] = 'enter validate email';
                 }
-                // ====== password error ========
-                // if(strlen($password) < 5){
-                //     $error[] = 'please enter password using 5 charecters atlesst';
-                // }
-                // if(strlen($password) > 30){
-                //     $error[] = 'password: max 30 charecters are allowed';
-                // }
-                // if(!preg_match('/^(?=.*\d)(?=.*[A-Za-z])[0-9A-Za-z!@#$%]{8,12}$/', $password)) {
-                //     $error[] = 'the password does not meet the requirements!';
-                // } 
-                // ======  confirm password error ========
+                
                 if($confirmPassword == ''){
                     $error[] = 'please comfirm the password';
                 }
@@ -66,56 +57,40 @@
                     $error[] = 'password do not match';
                 };
 
-                // if(strlen($comfirm_password) < 5){
-                //     $error[] = 'The password is minimum 4 charecter long';
-                // }
-                // if(strlen($confirm_password) > 30){
-                //     $error[] = 'The password is max 30 charecter long';
-                // }
-                // if(!preg_match('/^(?=.*\d)(?=.*[A-Za-z])[0-9A-Za-z!@#$%]{8,12}$/', $confirm_password)) {
-                //     $error[] = 'the comfirm_password does not meet the requirements!';
-                // }
-                // $sql = "select * from users where (username = '$username' or email = '$email');";
-                // $res = mysqli_query($con,$sql);  
-                // if (mysqli_num_rows($res) > 0) {
-                //     $row = mysqli_fetch_assoc($res);
-                //     if ($username   == $row['username']) {
-                //         $error[]    = 'Username already exists.';
-                //     }
-                //     if ($email     == $row['email']) {
-                //         $error[]    = 'email already exists.';
-                //     }
-                // } 
-                $sql="select * from userdata where (username='$username' or email='$email');";
-                $res=mysqli_query($con,$sql);
+               
+                $sql = "SELECT * FROM userdata WHERE username='$username' OR email='$email'";
+                $res = mysqli_query($con, $sql);
+                
                 if (mysqli_num_rows($res) > 0) {
                     $row = mysqli_fetch_assoc($res);
-
-                if($username==$row['username'])
-                {
-                    $error[] ='Username alredy Exists.';
-                    } 
-                if($email==$row['email'])
-                {
-                        $error[] ='Email alredy Exists.';
-                    } 
-                }
-
-                if(!isset($error)){
-                    $date       = date('Y-m-d');
-                    $options = array("cost"=>4);
-                    $password = $password;
-                    $password = password_hash($password,PASSWORD_BCRYPT,$options);
-
-                    $result     = mysqli_query($con, "INSERT into userdata(fname,lname,username,email,password,date) values('$fname','$lname','$username','$email','$password','$date')");
-                    if($result) {
-                        $done   = 2;
-                    } else {
-                        $error[]= 'Faild: Something went wrong';
+                    if ($username == $row['username']) {
+                        $error[] = 'Username already exists.';
+                    }
+                    if ($email == $row['email']) {
+                        $error[] = 'Email already exists.';
                     }
                 }
+
+                if (empty($error)) {
+                    $date = date('Y-m-d');
+                    $hashed_password = password_hash($password, PASSWORD_DEFAULT);
+                
+                    $stmt = mysqli_prepare($con, "INSERT INTO userdata(fname, lname, username, email, password, date) VALUES(?, ?, ?, ?, ?, ?)");
+                    mysqli_stmt_bind_param($stmt, "ssssss", $fname, $lname, $username, $email, $hashed_password, $date);
+                
+                    if (mysqli_stmt_execute($stmt)) {
+                        $done = true;
+                    } else {
+                        $error[] = 'Failed: Something went wrong.';
+                    }
+                
+                    mysqli_stmt_close($stmt);
+                }
+                
             }
             ?>
+
+            
             <div class="col-sm-4">
                 <?php
                 if(isset($error)) {
