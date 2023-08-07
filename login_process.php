@@ -1,9 +1,8 @@
 <?php
-require_once("config.php");
 session_start(); // Start the session
 
-if(isset($_POST['sublogin'])){ 
-    $username = $_POST['username'];
+if(isset($_POST['login'])){ 
+    $email = $_POST['email'];
     $password = $_POST['password'];
 
     $query = "SELECT * FROM userdata WHERE email='$email'";
@@ -15,7 +14,7 @@ if(isset($_POST['sublogin'])){
    
     $numRows = mysqli_num_rows($res);
     
-    if($numRows == 1) {
+    if($numRows) {
         $row = mysqli_fetch_assoc($res);
         $hashed_password = $row['password'];
         
@@ -34,5 +33,7 @@ if(isset($_POST['sublogin'])){
         header("Location: /form/login.php?loginerror=2"); // Redirect with login error
         exit;
     }
-}}
+}
+?>
+
 ?>
