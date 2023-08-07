@@ -105,7 +105,7 @@
                     $date       = date('Y-m-d');
                     $options = array("cost"=>4);
                     $password = $password;
-                    // $password = password_hash($password,PASSWORD_BCRYPT,$options);
+                    $password = password_hash($password,PASSWORD_BCRYPT,$options);
 
                     $result     = mysqli_query($con, "INSERT into userdata(fname,lname,username,email,password,date) values('$fname','$lname','$username','$email','$password','$date')");
                     if($result) {
