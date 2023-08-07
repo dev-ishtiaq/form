@@ -1,36 +1,38 @@
 <?php
-require_once("config.php"); 
+require_once("config.php");
+session_start(); // Start the session
 
 if(isset($_POST['sublogin'])){ 
-
-$login = $_POST['login_var'];
-$password = $_POST['password'];
-$query = "select * from userdata where ( username='$login' OR email = '$login')";
-$res = mysqli_query($con,$query);
-$numRows = mysqli_num_rows($res);
-if($numRows  == 1){
-
     $username = $_POST['username'];
     $password = $_POST['password'];
-    
-    $query = "SELECT * FROM userdata WHERE username='$username'";
+
+    $query = "SELECT * FROM userdata WHERE email='$email'";
     $res = mysqli_query($con, $query);
     
-    
+    if (!$res) {
+        die('MySQL Error: ' . mysqli_error($con));
+    }
+   
     $numRows = mysqli_num_rows($res);
     
     if($numRows == 1) {
-
         $row = mysqli_fetch_assoc($res);
-        $hashed_password = $row['password']; 
+        $hashed_password = $row['password'];
         
+
         if(password_verify($password, $hashed_password)){
-            header("Location: account.php");
-            exit();
+            $_SESSION['email'] = $email;
+            header("Location: /form/acount.php"); // Redirect to index page
+            exit;
         } else { 
-            header("Location: login.php?loginerror=a");
-            exit();
+            echo 'Password verification failed.';
+            header("Location: /form/login.php?loginerror=3"); // Redirect with login error
+            exit;
         }
+    } else {
+        echo 'User not found.';
+        header("Location: /form/login.php?loginerror=2"); // Redirect with login error
+        exit;
     }
 }}
 ?>

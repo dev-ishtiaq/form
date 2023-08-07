@@ -1,5 +1,14 @@
+<?php
+session_start();
+
+if(isset($_SESSION['username'])) {
+    header("Location: /index.php"); // Redirect if already logged in
+    exit;
+}
+?>
+
 <!DOCTYPE html>
-<?php require_once("config.php");?>
+
 <html lang="en">
 
 <head>
@@ -29,7 +38,7 @@
                                 if(!empty($loginerror)){  echo '<p class="errmsg">Invalid login credentials, Please Try Again..</p>'; } ?>
 
                             <label class="label_txt">Username or Email </label>
-                            <input type="text" name="username"
+                            <input type="email" name="email"
                                 value="<?php if(!empty($loginerror)){ echo  $loginerror; } ?>" class="form-control"
                                 required="">
                         </div>
